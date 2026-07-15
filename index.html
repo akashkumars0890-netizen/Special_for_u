@@ -1,0 +1,1496 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>For Sara</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@700&family=Dancing+Script:wght@600&family=Great+Vibes&family=Caveat:wght@500;700&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Playfair+Display:wght@500;700&display=swap" rel="stylesheet">
+
+<style>
+  :root {
+    --ink-deep: #0d0618;
+    --ink-mid: #241247;
+    --ink-plum: #3a1a5c;
+    --gold: #f3c969;
+    --gold-soft: #f6d98a;
+    --rose: #ff9db8;
+    --rose-deep: #ff6f9c;
+    --neon: #ff3fa4;
+    --neon-soft: #ff9bd4;
+    --paper: #fbf2e2;
+    --paper-line: #e8d8b8;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html, body {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background: #08040f;
+    font-family: 'Cormorant Garamond', serif;
+  }
+
+  #stage {
+    position: relative;
+    width: 100%;
+    height: 100vh;
+    min-height: 100vh;
+    overflow: hidden;
+    background: radial-gradient(ellipse at 50% 20%, var(--ink-plum) 0%, var(--ink-mid) 45%, var(--ink-deep) 100%);
+  }
+
+  /* ==========================================
+     CODE 1 SPECIFIC STYLES
+     ========================================== */
+  #code1-container {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 15;
+    pointer-events: auto;
+    transition: opacity 0.5s ease, visibility 0.5s ease; /* Speed up transition fade out */
+  }
+
+  .code1-canvas {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%;
+    height: 100%;
+  }
+  #rain  { z-index: 1; }
+  #fx    { z-index: 2; }
+  #heart1 { z-index: 3; }
+
+  .caption {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 4;
+    font-family: 'Dancing Script', cursive;
+    font-weight: 600;
+    font-size: min(6.2vw, 30px);
+    color: #ffe9f2;
+    text-shadow:
+      0 0 4px #ffffff,
+      0 0 10px #ff5fa2,
+      0 0 18px #ff1f88,
+      0 0 30px #b3003f;
+    white-space: nowrap;
+    text-align: center;
+    opacity: 0;
+    transition: opacity 1.8s ease;
+    pointer-events: none;
+  }
+  .caption.show { opacity: 1; animation: flicker 3.2s ease-in-out 1.8s infinite; }
+  .caption .heart-emoji {
+    color: #ff2f5f;
+    text-shadow: 0 0 8px #ff2f5f, 0 0 18px #b3003f;
+    font-family: initial;
+  }
+
+  @keyframes flicker {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.82; }
+  }
+
+  .overlay {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 6;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+  }
+
+  #startScreen {
+    opacity: 1;
+    transition: opacity 0.9s ease;
+  }
+  #startScreen.hide {
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .glow-heart {
+    font-size: min(20vw, 110px);
+    color: #ff2f5f;
+    text-shadow:
+      0 0 4px #ffffff,
+      0 0 14px #ff5fa2,
+      0 0 30px #ff1f88,
+      0 0 60px #b3003f;
+    animation: heartPulse 1.6s ease-in-out infinite;
+  }
+
+  @keyframes heartPulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.12); }
+  }
+
+  .tap-text {
+    margin-top: 22px;
+    font-family: 'Dancing Script', cursive;
+    font-weight: 600;
+    font-size: min(5.4vw, 26px);
+    color: #ffe9f2;
+    text-shadow: 0 0 4px #ffffff, 0 0 10px #ff5fa2, 0 0 18px #ff1f88;
+    opacity: 0.85;
+    animation: flicker 2.4s ease-in-out infinite;
+    text-align: center;
+    pointer-events: none;
+  }
+
+  #messageScreen {
+    display: none;
+    cursor: default;
+    padding: 0 6vw;
+    width: 100%;
+  }
+
+  .msg-line {
+    font-family: 'Dancing Script', cursive;
+    font-weight: 600;
+    font-size: min(9.5vw, 46px);
+    color: #ffe9f2;
+    text-shadow:
+      0 0 4px #ffffff,
+      0 0 12px #ff5fa2,
+      0 0 24px #ff1f88;
+    text-align: center;
+    width: 100%;
+    max-width: 900px;
+    margin: 12px auto;
+    opacity: 0;
+    transform: translateY(18px) scale(0.92);
+    filter: blur(4px);
+    will-change: opacity, transform, filter;
+    transition: opacity 1.2s ease-out,
+                transform 1.2s ease-out,
+                filter 1.2s ease-out;
+    pointer-events: none;
+  }
+  .msg-line.show {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    filter: blur(0);
+    animation: msgGlowPulse 2.6s ease-in-out 1.2s infinite;
+  }
+
+  @keyframes msgGlowPulse {
+    0%, 100% {
+      text-shadow:
+        0 0 4px #ffffff,
+        0 0 12px #ff5fa2,
+        0 0 24px #ff1f88;
+    }
+    50% {
+      text-shadow:
+        0 0 5px #ffffff,
+        0 0 16px #ff5fa2,
+        0 0 32px #ff1f88;
+    }
+  }
+
+  /* ==========================================
+     CODE 2 SPECIFIC STYLES
+     ========================================== */
+  .phase {
+    position: absolute; inset: 0;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    padding: 40px 16px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 1s ease;
+    text-align: center;
+  }
+  .phase.active { opacity: 1; pointer-events: auto; }
+
+  .star {
+    position: absolute;
+    width: 3px; height: 3px;
+    background: var(--gold-soft);
+    border-radius: 50%;
+    opacity: 0.2;
+    animation: twinkle 3.2s ease-in-out infinite;
+  }
+  @keyframes twinkle { 0%, 100% { opacity: 0.15; transform: scale(1); } 50% { opacity: 0.95; transform: scale(1.6); } }
+
+  /* ===== Phase 0: neon intro ===== */
+  #intro-scene .neon-wrap { position: relative; }
+  #intro-title {
+    font-family: 'Caveat', cursive;
+    font-weight: 700;
+    font-size: 64px;
+    color: #fff;
+    letter-spacing: 1px;
+    text-shadow:
+      0 0 6px #fff, 0 0 16px var(--neon), 0 0 30px var(--neon),
+      0 0 55px var(--neon), 0 0 80px var(--neon-soft);
+    animation: neonPulse 1.6s ease-in-out infinite, popIn 0.8s ease;
+  }
+  @keyframes neonPulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.72; } }
+  @keyframes popIn { 0% { transform: scale(0.4); opacity: 0; } 60% { transform: scale(1.12); opacity: 1; } 100% { transform: scale(1); opacity: 1; } }
+  .doodle { position: absolute; font-size: 20px; opacity: 0; animation: doodlePop 0.6s ease forwards; }
+  @keyframes doodlePop { 0% { opacity: 0; transform: scale(0) rotate(0deg); } 70% { opacity: 1; transform: scale(1.3) rotate(10deg); } 100% { opacity: 1; transform: scale(1) rotate(0deg); } }
+  .doodle.heart { color: var(--rose-deep); }
+  .doodle.star2 { color: var(--gold-soft); }
+  .doodle.note { color: #7fe0d8; }
+
+  /* ===== Phase 1: drag souls together ===== */
+  #souls-scene { touch-action: none; }
+  #souls-scene .tagline {
+    position: absolute; top: 12%;
+    font-family: 'Playfair Display', serif; font-style: italic; font-size: 19px;
+    letter-spacing: 3px; color: rgba(246, 217, 138, 0.85);
+  }
+  #souls-scene .instruction {
+    position: absolute; bottom: 10%;
+    font-family: 'Playfair Display', serif; font-size: 12px; letter-spacing: 3px;
+    text-transform: uppercase; color: rgba(246, 217, 138, 0.6);
+    transition: opacity 0.6s ease;
+  }
+  #heart-canvas {
+    position: absolute; inset: 0;
+    z-index: 6;
+  }
+  .soul {
+    position: absolute;
+    width: 26px; height: 26px;
+    border-radius: 50%;
+    transition: opacity 0.6s ease, left 0.9s cubic-bezier(.2,.8,.2,1), top 0.9s cubic-bezier(.2,.8,.2,1);
+  }
+  .soul-label {
+    position: absolute; top: -22px; left: 50%; transform: translateX(-50%);
+    font-family: 'Playfair Display', serif; font-size: 11px; letter-spacing: 2px;
+    text-transform: uppercase; white-space: nowrap; pointer-events: none;
+  }
+  #orb-you {
+    background: radial-gradient(circle, #fff, #d68cff 40%, transparent 72%);
+    box-shadow: 0 0 22px 8px #c77dff;
+    animation: idleFloat 3s ease-in-out infinite;
+  }
+  #orb-you .soul-label { color: #e6c8ff; }
+  #orb-me {
+    background: radial-gradient(circle, #fff, #ff5f7e 40%, transparent 72%);
+    box-shadow: 0 0 26px 9px #ff3d63;
+    cursor: grab;
+    z-index: 7;
+  }
+  #orb-me:active { cursor: grabbing; }
+  #orb-me .soul-label { color: #ffb9c6; }
+  @keyframes idleFloat { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
+
+  .trail-dot { position: absolute; border-radius: 50%; pointer-events: none; animation: trailFade 0.9s ease-out forwards; }
+  @keyframes trailFade { 0% { opacity: 0.9; transform: scale(1); } 100% { opacity: 0; transform: scale(0.2); } }
+
+  #souls-scene .drag-hint {
+    position: absolute; bottom: 10%;
+    font-family: 'Playfair Display', serif; font-size: 11px; letter-spacing: 2px;
+    text-transform: uppercase; color: rgba(246, 217, 138, 0.55);
+    opacity: 0; transition: opacity 0.8s ease;
+  }
+  #souls-scene .drag-hint.show { opacity: 1; }
+
+  /* ===== Phase 2: quote card ===== */
+  .fall-heart {
+    position: absolute; top: -8%; font-size: 16px; color: var(--rose); opacity: 0;
+    animation: fallDown linear infinite;
+    filter: drop-shadow(0 0 6px rgba(255, 111, 156, 0.45));
+  }
+  @keyframes fallDown {
+    0% { transform: translateY(0) translateX(0) rotate(0deg); opacity: 0; }
+    10% { opacity: 0.8; } 90% { opacity: 0.55; }
+    100% { transform: translateY(115vh) translateX(var(--drift, 20px)) rotate(-360deg); opacity: 0; }
+  }
+  #quote-scene .tagline {
+    position: absolute; top: 10%;
+    font-family: 'Playfair Display', serif; font-style: italic; font-size: 18px;
+    letter-spacing: 3px; color: rgba(246, 217, 138, 0.85);
+  }
+  .quote-card {
+    position: relative; z-index: 2; max-width: 480px; width: 100%;
+    background: rgba(15, 7, 26, 0.55);
+    border: 1px solid rgba(246, 217, 138, 0.25);
+    border-radius: 10px; padding: 30px 26px;
+    opacity: 0; transform: translateY(14px) scale(0.96);
+    transition: opacity 0.9s ease, transform 0.9s ease;
+  }
+  .quote-card.show { opacity: 1; transform: translateY(0) scale(1); }
+  .quote-eyebrow {
+    font-family: 'Playfair Display', serif; font-size: 13px; letter-spacing: 4px;
+    text-transform: uppercase; color: rgba(246, 217, 138, 0.7); margin-bottom: 10px;
+  }
+  .quote-main { font-family: 'Great Vibes', cursive; font-size: 40px; color: #f7e3ea; margin: 0 0 10px; }
+  .quote-sub {
+    font-family: 'Playfair Display', serif; font-size: 13px; letter-spacing: 2px;
+    text-transform: uppercase; color: rgba(255, 159, 184, 0.75);
+  }
+
+  /* ===== Phase 3: envelope scene ===== */
+  #prompt-text {
+    font-family: 'Great Vibes', cursive; font-size: 32px; color: var(--gold-soft);
+    margin-bottom: 28px; letter-spacing: 1px;
+    text-shadow: 0 0 18px rgba(243, 201, 105, 0.45);
+    animation: gentlePulse 2.4s ease-in-out infinite;
+  }
+  @keyframes gentlePulse { 0%, 100% { opacity: 0.75; transform: scale(1); } 50% { opacity: 1; transform: scale(1.035); } }
+  .envelope { position: relative; width: 260px; height: 170px; margin: 0 auto; cursor: pointer; animation: envFloat 3.4s ease-in-out infinite; }
+  @keyframes envFloat { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(-8px); } }
+  .envelope-body {
+    position: absolute; inset: 0;
+    background: linear-gradient(160deg, #efe0c2, #e2ceA0);
+    border-radius: 6px;
+    box-shadow: 0 18px 40px rgba(0,0,0,0.45), inset 0 0 0 1px rgba(255,255,255,0.15);
+  }
+  .envelope-body::before, .envelope-body::after { content: ""; position: absolute; top: 0; width: 0; height: 0; border-top: 85px solid #d8c298; }
+  .envelope-body::before { left: 0; border-left: 130px solid transparent; }
+  .envelope-body::after { right: 0; border-right: 130px solid transparent; }
+  .flap {
+    position: absolute; top: 0; left: 0; width: 0; height: 0;
+    border-left: 130px solid transparent; border-right: 130px solid transparent; border-top: 100px solid #f2e3c4;
+    transform-origin: top center;
+    transition: transform 1s cubic-bezier(.6,-0.28,.4,1.4);
+    z-index: 5;
+    filter: drop-shadow(0 4px 8px rgba(0,0,0,0.25));
+  }
+  .envelope.open .flap { transform: rotateX(180deg); }
+  .seal {
+    position: absolute; top: 66px; left: 50%; transform: translateX(-50%);
+    width: 46px; height: 46px;
+    background: radial-gradient(circle at 35% 30%, var(--rose-deep), #8c1338 75%);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    color: var(--gold-soft);
+    font-family: 'Great Vibes', cursive; font-size: 24px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.4);
+    z-index: 6;
+    transition: opacity 0.4s ease, transform 0.4s ease;
+  }
+  .envelope.open .seal { opacity: 0; transform: translateX(-50%) scale(0.4) rotate(30deg); }
+  .letter-peek {
+    position: absolute; left: 20px; right: 20px; top: 14px; height: 120px;
+    background: linear-gradient(180deg, var(--paper), #f3e6c9);
+    border-radius: 3px;
+    box-shadow: 0 6px 16px rgba(0,0,0,0.3);
+    z-index: 3;
+    transition: transform 1.1s cubic-bezier(.2,.8,.2,1) 0.15s, opacity .6s ease;
+    opacity: 0;
+  }
+  .envelope.open .letter-peek { opacity: 1; transform: translateY(-190px) scale(1.03); }
+  .hint {
+    margin-top: 26px; color: rgba(246, 217, 138, 0.65); font-size: 15px; letter-spacing: 2px;
+    text-transform: uppercase; font-family: 'Playfair Display', serif;
+    animation: gentlePulse 2.4s ease-in-out infinite;
+  }
+  .burst-heart { position: absolute; top: 60px; left: 50%; font-size: 14px; color: var(--rose); opacity: 0; pointer-events: none; }
+  .envelope.open .burst-heart { animation: burst 1.1s ease-out forwards; }
+  @keyframes burst {
+    0% { opacity: 1; transform: translate(-50%,0) scale(0.4); }
+    100% { opacity: 0; transform: translate(var(--bx), var(--by)) scale(1.1) rotate(180deg); }
+  }
+
+  /* ===== letter overlay ===== */
+  #letter-overlay {
+    position: fixed; inset: 0; z-index: 50;
+    display: none; align-items: flex-start; justify-content: center;
+    background: rgba(10,4,20,0.72);
+    padding: 32px 14px 60px;
+    overflow-y: auto;
+  }
+  #letter-overlay.show { display: flex; }
+  #letter-card {
+    position: relative; max-width: 560px; width: 100%;
+    background:
+      repeating-linear-gradient(var(--paper) 0px, var(--paper) 33px, var(--paper-line) 34px),
+      var(--paper);
+    border-radius: 4px;
+    padding: 52px 40px 44px;
+    box-shadow: 0 30px 70px rgba(0,0,0,0.55), 0 0 0 1px rgba(255,255,255,0.06);
+    transform: scaleY(0.02);
+    transform-origin: top center;
+    animation: unfurl 1.1s cubic-bezier(.2,.9,.25,1) forwards;
+    color: #3f2c1a;
+  }
+  @keyframes unfurl { 0% { transform: scaleY(0.02); opacity: 0.4; } 60% { transform: scaleY(1.04); opacity: 1; } 100% { transform: scaleY(1); opacity: 1; } }
+  .corner-heart { position: absolute; font-size: 20px; color: var(--rose-deep); opacity: 0.75; }
+  .corner-heart.tl { top: 14px; left: 16px; transform: rotate(-15deg); }
+  .corner-heart.tr { top: 14px; right: 16px; transform: rotate(15deg); }
+  .corner-heart.bl { bottom: 14px; left: 16px; transform: rotate(15deg); }
+  .corner-heart.br { bottom: 14px; right: 16px; transform: rotate(-15deg); }
+  #letter-title { font-family: 'Great Vibes', cursive; font-size: 44px; text-align: center; color: #8c1338; margin: 0 0 6px; }
+  #letter-sub { text-align: center; font-size: 15px; letter-spacing: 3px; text-transform: uppercase; color: #a07a48; margin-bottom: 26px; font-family: 'Playfair Display', serif; }
+  #letter-body { font-size: 19px; line-height: 1.85; white-space: pre-wrap; min-height: 60px; }
+  #letter-body .cursor { display: inline-block; width: 2px; background: #8c1338; animation: blink 0.8s steps(1) infinite; margin-left: 1px; height: 1em; vertical-align: text-bottom; }
+  @keyframes blink { 50% { opacity: 0; } }
+  #letter-signoff { margin-top: 18px; font-family: 'Great Vibes', cursive; font-size: 30px; color: #8c1338; text-align: right; opacity: 0; transition: opacity 0.8s ease; }
+  #letter-signoff.show { opacity: 1; }
+  #close-btn {
+    display: block; margin: 34px auto 0; background: transparent;
+    border: 1px solid rgba(140, 19, 56, 0.5); color: #8c1338;
+    font-family: 'Playfair Display', serif; letter-spacing: 2px; text-transform: uppercase;
+    font-size: 13px; padding: 11px 26px; border-radius: 30px; cursor: pointer;
+    opacity: 0; transition: opacity .8s ease, background .2s ease, color .2s ease;
+  }
+  #close-btn.show { opacity: 1; }
+  #close-btn:hover { background: #8c1338; color: var(--paper); }
+
+  #skip-btn {
+    position: absolute; bottom: 18px; right: 18px; z-index: 20;
+    background: transparent; border: 1px solid rgba(246, 217, 138, 0.4);
+    color: rgba(246, 217, 138, 0.85); font-family: 'Playfair Display', serif;
+    font-size: 11px; letter-spacing: 2px; text-transform: uppercase;
+    padding: 7px 14px; border-radius: 20px; cursor: pointer;
+    display: none;
+  }
+
+  @media (max-width: 480px) {
+    #intro-title { font-size: 46px; }
+    .quote-main { font-size: 30px; }
+    #letter-title { font-size: 36px; }
+    #letter-body { font-size: 17px; }
+    .envelope { width: 220px; height: 145px; }
+    .envelope-body::before, .envelope-body::after { border-top: 72px solid #d8c298; }
+    .envelope-body::before { border-left: 110px solid transparent; }
+    .envelope-body::after { border-right: 110px solid transparent; }
+    .flap { border-left: 110px solid transparent; border-right: 110px solid transparent; border-top: 84px solid #f2e3c4; }
+    .letter-peek { height: 100px; }
+  }
+</style>
+</head>
+<body>
+
+<div id="stage">
+
+  <!-- ============================================================
+       CODE 1 GRAPHICS AND MESSAGES INTERACTION LAYER
+       ============================================================ -->
+  <div id="code1-container">
+    <canvas id="rain" class="code1-canvas"></canvas>
+    <canvas id="fx" class="code1-canvas"></canvas>
+    <canvas id="heart1" class="code1-canvas"></canvas>
+
+    <div class="caption" id="caption"> 
+      You're <span class="heart-emoji">&#10084;</span> very close to my heart 
+      Can't imagine life without you 
+    </div>
+
+    <div class="overlay" id="startScreen">
+      <div class="glow-heart">&#10084;</div>
+      <div class="tap-text">tap to begin</div>
+    </div>
+
+    <div class="overlay" id="messageScreen">
+      <div class="msg-line" id="msg1">hey&hellip; come closer</div>
+      <div class="msg-line" id="msg2">I wrote you something</div>
+      <div class="msg-line" id="msg3">something a normal message couldn't hold</div>
+      <div class="msg-line" id="msg4">so I built it instead</div>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       CODE 2 NARRATIVE STAGES & INTERACTIVE MINIGAME
+       ============================================================ -->
+  <div class="phase" id="intro-scene">
+    <div class="neon-wrap"><div id="intro-title">Hey Sara...</div></div>
+  </div>
+
+  <div class="phase" id="souls-scene">
+    <canvas id="heart-canvas"></canvas>
+    <div class="tagline">two souls. one universe.</div>
+    <div class="soul" id="orb-you"><span class="soul-label">you</span></div>
+    <div class="soul" id="orb-me"><span class="soul-label">me</span></div>
+    <div class="instruction" id="souls-instruction">drag the souls together</div>
+    <div class="drag-hint" id="drag-hint">one heart, two souls &mdash; go on, drag it</div>
+  </div>
+
+  <div class="phase" id="quote-scene">
+    <div class="tagline">two souls. one universe.</div>
+    <div class="quote-card" id="quote-card">
+      <div class="quote-eyebrow">in 7 billion people</div>
+      <div class="quote-main">"...I found you."</div>
+      <div class="quote-sub">some friendships are written in the stars</div>
+    </div>
+  </div>
+
+  <div class="phase" id="envelope-scene">
+    <div id="prompt-text">A little something for Sara</div>
+    <div class="envelope" id="envelope" onclick="openEnvelope()">
+      <div class="letter-peek"></div>
+      <div class="envelope-body"></div>
+      <div class="flap"></div>
+      <div class="seal">S</div>
+    </div>
+    <div class="hint">tap the envelope</div>
+  </div>
+
+  <button id="skip-btn" onclick="skipIntro()">skip intro</button>
+</div>
+
+<!-- ============================================================
+     CODE 2 WRITTEN LETTER MODAL
+     ============================================================ -->
+<div id="letter-overlay">
+  <div id="letter-card">
+    <span class="corner-heart tl">&#10084;</span>
+    <span class="corner-heart tr">&#10084;</span>
+    <span class="corner-heart bl">&#10084;</span>
+    <span class="corner-heart br">&#10084;</span>
+    <div id="letter-title">Dear Sara</div>
+    <div id="letter-sub">A letter of gratitude</div>
+    <div id="letter-body"></div>
+    <div id="letter-signoff">Always your friend</div>
+    <button id="close-btn" onclick="closeLetter()">Seal it back up</button>
+  </div>
+</div>
+
+<script>
+/* ============================================================
+   SHARED & GLOBAL CONFIGURATIONS
+   ============================================================ */
+const stage = document.getElementById('stage');
+function rand(min, max){ return Math.random() * (max - min) + min; }
+
+// Background stars (Code 2 background)
+function makeStars(container, count){
+  for(let i=0; i<count; i++){
+    const s = document.createElement('div');
+    s.className = 'star';
+    s.style.left = rand(0, 100) + '%';
+    s.style.top = rand(0, 100) + '%';
+    s.style.animationDelay = rand(0, 3) + 's';
+    s.style.animationDuration = rand(2.2, 4.2) + 's';
+    container.appendChild(s);
+  }
+}
+makeStars(stage, 60);
+
+
+/* ============================================================
+   CODE 1 - MATRIX RAIN & PARTICLE CONVERGE LOGIC
+   ============================================================ */
+const rainCanvas = document.getElementById('rain');
+const fxCanvas = document.getElementById('fx');
+const heartCanvas1 = document.getElementById('heart1');
+const rctx = rainCanvas.getContext('2d');
+const fctx = fxCanvas.getContext('2d');
+const hctx1 = heartCanvas1.getContext('2d');
+
+let w, h;
+let code1Active = true; 
+
+function resizeAllCode1() {
+  if (!code1Active) return;
+  w = window.innerWidth; h = window.innerHeight;
+  [rainCanvas, fxCanvas, heartCanvas1].forEach(c => { c.width = w; c.height = h; });
+  buildRainColumns();
+  buildWallpaper();
+  buildEmojiRain();
+}
+window.addEventListener('resize', resizeAllCode1);
+
+// Static low-alpha background wallpaper
+const wallpaperCanvas = document.createElement('canvas');
+let wctx;
+
+function buildWallpaper() {
+  wallpaperCanvas.width = w;
+  wallpaperCanvas.height = h;
+  wctx = wallpaperCanvas.getContext('2d');
+  wctx.clearRect(0, 0, w, h);
+  wctx.font = '13px monospace';
+  const glyphSet = 'LOVEUOI♥•SARA'.split('');
+  const gapX = 20, gapY = 20;
+  for (let y = 0; y < h; y += gapY) {
+    for (let x = 0; x < w; x += gapX) {
+      if (Math.random() < 0.55) {
+        const g = glyphSet[Math.floor(Math.random() * glyphSet.length)];
+        wctx.fillStyle = `rgba(255,120,160,${0.05 + Math.random() * 0.05})`;
+        wctx.fillText(g, x + (Math.random() - 0.5) * 8, y + (Math.random() - 0.5) * 8);
+      }
+    }
+  }
+}
+
+// Matrix falling stream logic
+const fontSize = 13;
+const RAIN_WORDS = ["LOVE", "YOU", "FOREVER", "MINE", "HEART", "ALWAYS", "♥"];
+const TRAIL_LEN = 5;
+
+let columns, drops, colWords, colLetterIdx;
+let rainOpacity = 0;
+let focusAmount = 0;
+
+function buildRainColumns() {
+  columns = Math.floor(w / fontSize);
+  drops = new Array(columns).fill(0).map(() => Math.random() * -50);
+  colWords = new Array(columns).fill(0).map(() => RAIN_WORDS[Math.floor(Math.random() * RAIN_WORDS.length)]);
+  colLetterIdx = new Array(columns).fill(0).map(() => Math.floor(Math.random() * 8));
+}
+
+function drawRain() {
+  rctx.fillStyle = `rgba(26,5,16,${rainOpacity > 0 ? 0.14 : 1})`;
+  rctx.fillRect(0, 0, w, h);
+
+  if (wctx) {
+    rctx.globalAlpha = rainOpacity;
+    rctx.drawImage(wallpaperCanvas, 0, 0);
+    rctx.globalAlpha = 1;
+  }
+
+  rctx.font = 'bold ' + fontSize + 'px monospace';
+
+  for (let i = 0; i < columns; i++) {
+    const word = colWords[i];
+    const x = i * fontSize;
+
+    for (let k = 0; k < TRAIL_LEN; k++) {
+      const letter = word[Math.max(0, colLetterIdx[i] - k) % word.length];
+      const y = (drops[i] - k) * fontSize;
+      if (y < 0) continue;
+      const isHeart = letter === '♥';
+      const tail = 1 - k / TRAIL_LEN;
+      const color = isHeart ? '255,60,120' : '255,150,195';
+      const alpha = (isHeart ? 0.8 : 0.6) * rainOpacity * tail;
+
+      rctx.shadowColor = `rgba(${color},${Math.min(1, alpha + 0.25)})`;
+      rctx.shadowBlur = k === 0 ? (isHeart ? 9 : 6) : 3;
+      rctx.fillStyle = `rgba(${color},${alpha})`;
+      rctx.fillText(letter, x, y);
+    }
+
+    if (Math.random() < 0.03) {
+      const letter = word[colLetterIdx[i] % word.length];
+      rctx.shadowBlur = 10;
+      rctx.shadowColor = `rgba(255,240,245,${rainOpacity})`;
+      rctx.fillStyle = `rgba(255,240,245,${0.9 * rainOpacity})`;
+      rctx.fillText(letter, x, drops[i] * fontSize);
+    }
+
+    colLetterIdx[i]++;
+
+    if (drops[i] * fontSize > h && Math.random() > 0.97) {
+      drops[i] = 0;
+      colWords[i] = RAIN_WORDS[Math.floor(Math.random() * RAIN_WORDS.length)];
+      colLetterIdx[i] = 0;
+    }
+    drops[i]++;
+  }
+  rctx.shadowBlur = 0;
+
+  drawEmojiRain();
+
+  let focusTarget = (currentDotParticles.length > 0 || dispersingParticles.length > 0 || heartAnimActive) ? 0.85 : 0;
+  focusAmount += (focusTarget - focusAmount) * 0.06;
+
+  if (focusAmount > 0.01) {
+    const cx = w / 2, cy = h / 2;
+    const radius = Math.max(w, h) * 0.42;
+    const grad = rctx.createRadialGradient(cx, cy, radius * 0.1, cx, cy, radius);
+    grad.addColorStop(0, `rgba(26,5,16,${0.85 * focusAmount})`);
+    grad.addColorStop(0.6, `rgba(26,5,16,${0.55 * focusAmount})`);
+    grad.addColorStop(1, `rgba(26,5,16,0)`);
+    rctx.fillStyle = grad;
+    rctx.fillRect(0, 0, w, h);
+  }
+}
+
+// Drifting heart emojis
+const HEART_EMOJI = ['❤', '💗', '💕', '♡', '💖'];
+let emojiDrops = [];
+
+function buildEmojiRain() {
+  const count = Math.max(10, Math.floor(w / 90));
+  emojiDrops = new Array(count).fill(0).map(() => ({
+    x: Math.random() * w,
+    y: Math.random() * -h,
+    speed: 0.6 + Math.random() * 1.1,
+    size: 14 + Math.random() * 16,
+    glyph: HEART_EMOJI[Math.floor(Math.random() * HEART_EMOJI.length)],
+    drift: (Math.random() - 0.5) * 0.4
+  }));
+}
+
+function drawEmojiRain() {
+  rctx.save();
+  for (const d of emojiDrops) {
+    rctx.font = d.size + 'px sans-serif';
+    rctx.globalAlpha = 0.55 * rainOpacity;
+    rctx.shadowColor = 'rgba(255,60,120,0.9)';
+    rctx.shadowBlur = 12;
+    rctx.fillText(d.glyph, d.x, d.y);
+
+    d.y += d.speed * fontSize * 0.18;
+    d.x += d.drift;
+    if (d.y > h + 20) {
+      d.y = -20;
+      d.x = Math.random() * w;
+      d.glyph = HEART_EMOJI[Math.floor(Math.random() * HEART_EMOJI.length)],
+      d.drift = (Math.random() - 0.5) * 0.4;
+    }
+  }
+  rctx.restore();
+}
+
+// Sparkle Particle Count-down System
+let currentDotParticles = [];
+let dispersingParticles = [];
+
+function buildDotPoints(str) {
+  for (const p of currentDotParticles) {
+    const angle = Math.random() * Math.PI * 2;
+    const speed = rand(1.5, 4.5);
+    dispersingParticles.push({
+      x: p.x,
+      y: p.y,
+      vx: Math.cos(angle) * speed,
+      vy: Math.sin(angle) * speed - rand(0.3, 1.8),
+      r: p.r,
+      alpha: 1,
+      sparkleSpeed: rand(1.5, 3.5),
+      sparklePhase: Math.random() * Math.PI * 2
+    });
+  }
+  currentDotParticles = [];
+
+  if (!str) return;
+
+  const off = document.createElement('canvas');
+  off.width = w; off.height = h;
+  const octx = off.getContext('2d');
+  const size = str.length > 2 ? Math.min(w * 0.28, 180) : Math.min(w * 0.38, 240);
+  octx.font = `bold ${size}px Poppins, sans-serif`;
+  octx.textAlign = 'center';
+  octx.textBaseline = 'middle';
+  octx.fillStyle = '#fff';
+  octx.fillText(str, w / 2, h / 2);
+
+  const step = 6; 
+  const data = octx.getImageData(0, 0, w, h).data;
+  
+  for (let y = 0; y < h; y += step) {
+    for (let x = 0; x < w; x += step) {
+      const idx = (y * w + x) * 4 + 3;
+      if (data[idx] > 128) {
+        const tx = x + (Math.random() - 0.5) * 2;
+        const ty = y + (Math.random() - 0.5) * 2;
+        
+        const scatterDist = rand(40, 85);
+        const scatterAngle = Math.random() * Math.PI * 2;
+        
+        currentDotParticles.push({
+          x: tx + Math.cos(scatterAngle) * scatterDist,
+          y: ty + Math.sin(scatterAngle) * scatterDist,
+          tx: tx,
+          ty: ty,
+          r: 1.6 + Math.random() * 2.4,
+          alpha: 0,
+          sparkleSpeed: rand(2.5, 5.5),
+          sparklePhase: Math.random() * Math.PI * 2,
+          flySpeed: rand(0.05, 0.09)
+        });
+      }
+    }
+  }
+}
+
+function drawDotText(now) {
+  fctx.clearRect(0, 0, w, h);
+  if (!code1Active) return;
+  
+  fctx.save();
+  
+  for (let i = dispersingParticles.length - 1; i >= 0; i--) {
+    const p = dispersingParticles[i];
+    p.x += p.vx;
+    p.y += p.vy;
+    p.vy += 0.03;
+    p.alpha -= 0.014;
+    
+    if (p.alpha <= 0) {
+      dispersingParticles.splice(i, 1);
+      continue;
+    }
+    
+    const sparkle = 0.4 + Math.sin(now * 0.005 * p.sparkleSpeed + p.sparklePhase) * 0.6;
+    const currentAlpha = Math.max(0, p.alpha * sparkle);
+    
+    fctx.beginPath();
+    fctx.arc(p.x, p.y, p.r * (0.7 + sparkle * 0.5), 0, Math.PI * 2);
+    fctx.fillStyle = `rgba(255, 220, 235, ${currentAlpha})`;
+    fctx.shadowColor = Math.random() < 0.4 ? '#ffffff' : '#ff6f9c';
+    fctx.shadowBlur = 14 * sparkle;
+    fctx.fill();
+  }
+  
+  for (const p of currentDotParticles) {
+    p.x += (p.tx - p.x) * p.flySpeed;
+    p.y += (p.ty - p.y) * p.flySpeed;
+    
+    if (p.alpha < 1) p.alpha += 0.06;
+    
+    const sparkle = 0.5 + Math.sin(now * 0.005 * p.sparkleSpeed + p.sparklePhase) * 0.5;
+    
+    fctx.beginPath();
+    fctx.arc(p.x, p.y, p.r * (0.9 + sparkle * 0.3), 0, Math.PI * 2);
+    fctx.fillStyle = `rgba(255, 255, 255, ${p.alpha * (0.7 + sparkle * 0.3)})`;
+    fctx.shadowColor = Math.random() < 0.25 ? '#ffffff' : '#ff3fa4';
+    fctx.shadowBlur = 8 + sparkle * 10;
+    fctx.fill();
+  }
+  
+  fctx.restore();
+}
+
+// Converging Heart Particles (Code 1 style)
+function heartPoint1(t, scale) {
+  const x = 16 * Math.pow(Math.sin(t), 3);
+  const y = 13 * Math.cos(t) - 5 * Math.cos(2*t) - 2 * Math.cos(3*t) - Math.cos(4*t);
+  return { x: x * scale, y: -y * scale };
+}
+
+let particles1 = [];
+let heartAnimActive = false;
+let heartFormedAt = 0;
+
+function buildParticles1(count) {
+  const cx = w / 2, cy = h * 0.46;
+  const scale = Math.min(w, h) / 34;
+  const pts = [];
+  for (let i = 0; i < count; i++) {
+    const t = (i / count) * Math.PI * 2;
+    const jitterT = t + (Math.random() - 0.5) * 0.02;
+    const p = heartPoint1(jitterT, scale * (0.94 + Math.random() * 0.12));
+    pts.push({
+      tx: cx + p.x,
+      ty: cy + p.y,
+      x: Math.random() * w,
+      y: Math.random() * h,
+      size: 1.8 + Math.random() * 2.6,
+      hue: Math.random() < 0.5 ? '255,111,156' : '255,31,78',
+      speed: 0.05 + Math.random() * 0.055,
+      floatPhase: Math.random() * Math.PI * 2,
+      floatSpeed: 0.6 + Math.random() * 0.8,
+      sparklePhase: Math.random() * Math.PI * 2,
+      sparkleSpeed: 0.8 + Math.random() * 1.6
+    });
+  }
+  return pts;
+}
+
+function drawHeartGlow1(now) {
+  const cx = w / 2, cy = h * 0.46;
+  const baseR = Math.min(w, h) * 0.26;
+  const pulse = 0.85 + Math.sin(now / 1100) * 0.15;
+  const grad = hctx1.createRadialGradient(cx, cy, 0, cx, cy, baseR * pulse);
+  grad.addColorStop(0, 'rgba(255,60,120,0.24)');
+  grad.addColorStop(0.5, 'rgba(255,20,80,0.12)');
+  grad.addColorStop(1, 'rgba(255,20,80,0)');
+  hctx1.fillStyle = grad;
+  hctx1.fillRect(0, 0, w, h);
+}
+
+function drawHeart1(now) {
+  if (!heartAnimActive) { hctx1.clearRect(0, 0, w, h); return; }
+  hctx1.clearRect(0, 0, w, h);
+
+  drawHeartGlow1(now);
+
+  let allSettled = true;
+  for (const p of particles1) {
+    p.x += (p.tx - p.x) * p.speed;
+    p.y += (p.ty - p.y) * p.speed;
+
+    const d = Math.hypot(p.tx - p.x, p.ty - p.y);
+    if (d > 1) allSettled = false;
+
+    let drawX = p.x, drawY = p.y;
+    if (d < 2) {
+      const t = now / 1000;
+      drawX += Math.sin(t * p.floatSpeed + p.floatPhase) * 1.4;
+      drawY += Math.cos(t * p.floatSpeed * 0.8 + p.floatPhase) * 1.4;
+    }
+
+    const sparkle = 0.75 + Math.sin(now / 1000 * p.sparkleSpeed + p.sparklePhase) * 0.25;
+
+    hctx1.beginPath();
+    hctx1.arc(drawX, drawY, p.size * sparkle, 0, Math.PI * 2);
+    hctx1.fillStyle = `rgba(${p.hue},${0.85 * sparkle})`;
+    hctx1.shadowBlur = 10;
+    hctx1.shadowColor = `rgba(${p.hue},0.9)`;
+    hctx1.fill();
+  }
+
+  if (allSettled && heartFormedAt === 0) heartFormedAt = now;
+}
+
+function formHeart1() {
+  particles1 = buildParticles1(460);
+  heartAnimActive = true;
+}
+
+// Code 1 Master Rendering Loop
+function loopCode1(now) {
+  if (!code1Active) return;
+  drawRain();
+  drawDotText(now);
+  drawHeart1(now);
+  requestAnimationFrame(loopCode1);
+}
+
+// Fade animations
+function fadeRainIn(duration) {
+  const start = performance.now();
+  function step(t) {
+    if (!code1Active) return;
+    const p = Math.min(1, (t - start) / duration);
+    rainOpacity = p;
+    if (p < 1) requestAnimationFrame(step);
+  }
+  requestAnimationFrame(step);
+}
+
+function wait(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+async function showWord(word, holdMs) {
+  if (!code1Active) return;
+  buildDotPoints(word);
+  await wait(holdMs);
+}
+
+// Orchestrator for Code 1 Intro
+async function runIntro() {
+  if (!code1Active) return;
+  await wait(1500);
+
+  await showWord('3', 2400);
+  await showWord('2', 2400);
+  await showWord('1', 2400);
+
+  await wait(400);
+
+  await showWord('YOU', 2400);
+  await showWord('ARE', 2400);
+  await showWord('LOVED', 2800);
+
+  await wait(400);
+  
+  buildDotPoints(''); 
+
+  formHeart1();
+  rainOpacity = 0.4;
+  await wait(1600);
+  document.getElementById('caption').classList.add('show');
+
+  await wait(2200); /* Speed up transition timeline from 5000ms to 2200ms */
+  if (!skipped) {
+    transitionToCode2();
+  }
+}
+
+async function runMessages() {
+  if (!code1Active) return;
+  const messageScreen = document.getElementById('messageScreen');
+  const lines = ['msg1', 'msg2', 'msg3', 'msg4'].map(id => document.getElementById(id));
+
+  messageScreen.style.display = 'flex';
+
+  for (const line of lines) {
+    if (!code1Active) return;
+    line.classList.add('show');
+    await wait(2400); 
+    line.classList.remove('show');
+    await wait(500);
+  }
+
+  await wait(400);
+  messageScreen.style.display = 'none';
+  runIntro();
+}
+
+// Transition Handler to Code 2 Layer
+function transitionToCode2() {
+  code1Active = false;
+  const c1Container = document.getElementById('code1-container');
+  c1Container.style.opacity = '0';
+  c1Container.style.pointerEvents = 'none';
+  setTimeout(() => {
+    c1Container.style.display = 'none';
+  }, 500); /* Speed up element display cutoff from 1200ms to 500ms */
+
+  runSequence(); 
+}
+
+// Tap Handler to Start Code 1 Sequence
+document.getElementById('startScreen').addEventListener('click', () => {
+  const startScreen = document.getElementById('startScreen');
+  startScreen.classList.add('hide');
+  document.getElementById('skip-btn').style.display = 'block';
+  fadeRainIn(2200);
+  setTimeout(() => {
+    startScreen.style.display = 'none';
+    runMessages();
+  }, 1000);
+}, { once: true });
+
+
+/* ============================================================
+   CODE 2 - STAGED MULTI-PHASE SYSTEM
+   ============================================================ */
+
+/* ---------- Phase 0: neon intro doodles ---------- */
+function buildIntroDoodles(){
+  const wrap = document.querySelector('#intro-scene .neon-wrap');
+  const items = [
+    {cls:'heart', glyph:'&#10084;', x:-70, y:-30, delay:0.3},
+    {cls:'star2', glyph:'&#9733;', x:80, y:-25, delay:0.5},
+    {cls:'note', glyph:'&#9834;', x:95, y:20, delay:0.7},
+    {cls:'heart', glyph:'&#10084;', x:75, y:35, delay:0.9},
+    {cls:'star2', glyph:'&#9733;', x:-90, y:25, delay:1.05},
+    {cls:'heart', glyph:'&#10084;', x:-55, y:45, delay:1.2}
+  ];
+  items.forEach(it => {
+    const d = document.createElement('div');
+    d.className = 'doodle ' + it.cls;
+    d.innerHTML = it.glyph;
+    d.style.left = 'calc(50% + ' + it.x + 'px)';
+    d.style.top = 'calc(50% + ' + it.y + 'px)';
+    d.style.animationDelay = it.delay + 's';
+    wrap.appendChild(d);
+  });
+}
+buildIntroDoodles();
+
+/* ---------- Heart cluster particle system (canvas 2) ---------- */
+function heartPoint2(t){
+  const x = 16 * Math.pow(Math.sin(t), 3);
+  const y = 13*Math.cos(t) - 5*Math.cos(2*t) - 2*Math.cos(3*t) - Math.cos(4*t);
+  return { x: x, y: -y };
+}
+
+const heartCanvas2 = document.getElementById('heart-canvas');
+const hctx2 = heartCanvas2.getContext('2d');
+let heartParticles = [];
+let heartCenter = { x: 0, y: 0 };
+let centerTarget = { x: 0, y: 0 };
+let heartRings = [];
+let heartActive = false;
+let heartRAF = null;
+let heartDragging = false;
+
+const YOU_COLOR = '178,120,255';
+const ME_COLOR = '255,80,70';
+
+function sizeHeartCanvas(){
+  const rect = soulsScene.getBoundingClientRect();
+  heartCanvas2.width = rect.width;
+  heartCanvas2.height = rect.height;
+}
+
+function startHeartCluster(originX, originY){
+  heartActive = true;
+  heartCenter = { x: originX, y: originY };
+  sizeHeartCanvas();
+  const rect = soulsScene.getBoundingClientRect();
+  centerTarget = { x: rect.width * 0.5, y: rect.height * 0.46 };
+  const scale = Math.min(rect.width, rect.height) / 32;
+  const count = 150;
+  heartParticles = [];
+  for(let i=0; i<count; i++){
+    const t = (i/count) * Math.PI * 2;
+    const p = heartPoint2(t);
+    const fromYou = i % 2 === 0;
+    const srcX = fromYou ? youX : meX;
+    const srcY = fromYou ? youY : meY;
+    heartParticles.push({
+      ox: p.x * scale * (0.95 + Math.random()*0.1),
+      oy: p.y * scale * (0.95 + Math.random()*0.1),
+      x: srcX + rand(-15,15),
+      y: srcY + rand(-15,15),
+      size: rand(1.6, 3.8),
+      color: fromYou ? YOU_COLOR : ME_COLOR,
+      speed: rand(0.055, 0.11),
+      floatPhase: rand(0, Math.PI*2)
+    });
+  }
+  if(!heartRAF) heartRAF = requestAnimationFrame(heartFrame);
+}
+
+function heartFrame(now){
+  if(!heartActive){ heartRAF = null; return; }
+  hctx2.clearRect(0, 0, heartCanvas2.width, heartCanvas2.height);
+
+  const lerpRate = heartDragging ? 0.001 : 0.045;
+  heartCenter.x += (centerTarget.x - heartCenter.x) * lerpRate;
+  heartCenter.y += (centerTarget.y - heartCenter.y) * lerpRate;
+
+  if(Math.random() < 0.025 && heartRings.length < 6){
+    heartRings.push({ r: 14, a: 0.35 });
+  }
+  for(let i=heartRings.length-1; i>=0; i--){
+    const r = heartRings[i];
+    r.r += 0.9; r.a -= 0.0038;
+    if(r.a <= 0){ heartRings.splice(i,1); continue; }
+    hctx2.beginPath();
+    hctx2.arc(heartCenter.x, heartCenter.y, r.r, 0, Math.PI*2);
+    hctx2.strokeStyle = `rgba(255,120,150,${r.a})`;
+    hctx2.lineWidth = 1;
+    hctx2.stroke();
+  }
+
+  const pulse = 0.85 + Math.sin(now/420) * 0.15;
+  const outer = hctx2.createRadialGradient(heartCenter.x, heartCenter.y, 0, heartCenter.x, heartCenter.y, 160*pulse);
+  outer.addColorStop(0, `rgba(255,70,120,${0.3*pulse})`);
+  outer.addColorStop(0.5, `rgba(255,40,90,${0.15*pulse})`);
+  outer.addColorStop(1, 'rgba(255,40,90,0)');
+  hctx2.fillStyle = outer;
+  hctx2.fillRect(0, 0, hctx2.canvas.width, hctx2.canvas.height);
+
+  const core = hctx2.createRadialGradient(heartCenter.x, heartCenter.y, 0, heartCenter.x, heartCenter.y, 48*pulse);
+  core.addColorStop(0, `rgba(255,190,205,${0.4*pulse})`);
+  core.addColorStop(1, 'rgba(255,190,205,0)');
+  hctx2.fillStyle = core;
+  hctx2.fillRect(0, 0, hctx2.canvas.width, hctx2.canvas.height);
+
+  for(const p of heartParticles){
+    const tx = heartCenter.x + p.ox;
+    const ty = heartCenter.y + p.oy;
+    p.x += (tx - p.x) * p.speed;
+    p.y += (ty - p.y) * p.speed;
+    const d = Math.hypot(tx - p.x, ty - p.y);
+    let dx = p.x, dy = p.y;
+    if(d < 2){
+      const tt = now/1000;
+      dx += Math.sin(tt + p.floatPhase) * 1.2;
+      dy += Math.cos(tt*0.8 + p.floatPhase) * 1.2;
+    }
+    hctx2.beginPath();
+    hctx2.arc(dx, dy, p.size, 0, Math.PI*2);
+    hctx2.fillStyle = `rgba(${p.color},0.88)`;
+    hctx2.shadowColor = `rgba(${p.color},0.9)`;
+    hctx2.shadowBlur = 13;
+    hctx2.fill();
+  }
+  hctx2.shadowBlur = 0;
+
+  heartRAF = requestAnimationFrame(heartFrame);
+}
+
+function stopHeartCluster(){
+  heartActive = false;
+  if(heartRAF){ cancelAnimationFrame(heartRAF); heartRAF = null; }
+  hctx2.clearRect(0,0,heartCanvas2.width, heartCanvas2.height);
+}
+
+/* draggable heart once formed */
+heartCanvas2.addEventListener('pointerdown', (e) => {
+  if(!heartActive) return;
+  const rect = heartCanvas2.getBoundingClientRect();
+  const x = e.clientX - rect.left, y = e.clientY - rect.top;
+  if(Math.hypot(x - heartCenter.x, y - heartCenter.y) < 90){
+    heartDragging = true;
+    heartCanvas2.setPointerCapture(e.pointerId);
+  }
+});
+heartCanvas2.addEventListener('pointermove', (e) => {
+  if(!heartDragging) return;
+  const rect = heartCanvas2.getBoundingClientRect();
+  centerTarget = { x: e.clientX - rect.left, y: e.clientY - rect.top };
+  heartCenter = { x: centerTarget.x, y: centerTarget.y };
+});
+function releaseHeartDrag(){
+  if(!heartDragging) return;
+  heartDragging = false;
+  const rect = soulsScene.getBoundingClientRect();
+  centerTarget = { x: rect.width*0.5, y: rect.height*0.46 };
+}
+heartCanvas2.addEventListener('pointerup', releaseHeartDrag);
+heartCanvas2.addEventListener('pointercancel', releaseHeartDrag);
+
+/* ---------- Drag-the-souls-together interaction ---------- */
+const soulsScene = document.getElementById('souls-scene');
+const orbYou = document.getElementById('orb-you');
+const orbMe = document.getElementById('orb-me');
+let merged = false;
+let meX = 0, meY = 0;
+let youX = 0, youY = 0;
+let dragging = false;
+let dragOffX = 0, dragOffY = 0;
+let lastTrailX = null, lastTrailY = null;
+
+function placeInitialSouls(){
+  const rect = soulsScene.getBoundingClientRect();
+  youX = rect.width * 0.22;
+  youY = rect.height * 0.55;
+  meX = rect.width * 0.78;
+  meY = rect.height * 0.38;
+  orbYou.style.left = youX + 'px';
+  orbYou.style.top = youY + 'px';
+  orbMe.style.left = meX + 'px';
+  orbMe.style.top = meY + 'px';
+  sizeHeartCanvas();
+}
+
+function spawnTrailDot(x, y, color){
+  const dot = document.createElement('div');
+  dot.className = 'trail-dot';
+  const size = rand(3,7);
+  dot.style.width = size + 'px';
+  dot.style.height = size + 'px';
+  dot.style.background = color;
+  dot.style.boxShadow = '0 0 6px 2px ' + color;
+  dot.style.left = (x + rand(-4,4) - size/2) + 'px';
+  dot.style.top = (y + rand(-4,4) - size/2) + 'px';
+  soulsScene.appendChild(dot);
+  setTimeout(() => dot.remove(), 900);
+}
+
+function trailLoop(){
+  if(!merged){
+    if(lastTrailX === null || Math.hypot(meX-lastTrailX, meY-lastTrailY) > 3){
+      spawnTrailDot(meX, meY, '#ff3d63');
+      lastTrailX = meX; lastTrailY = meY;
+    }
+    requestAnimationFrame(trailLoop);
+  }
+}
+requestAnimationFrame(trailLoop);
+
+function onPointerDown(e){
+  if(merged) return;
+  dragging = true;
+  orbMe.setPointerCapture(e.pointerId);
+  const rect = soulsScene.getBoundingClientRect();
+  const px = e.clientX - rect.left, py = e.clientY - rect.top;
+  dragOffX = meX - px;
+  dragOffY = meY - py;
+  document.getElementById('souls-instruction').style.opacity = '0.9';
+}
+function onPointerMove(e){
+  if(!dragging || merged) return;
+  const rect = soulsScene.getBoundingClientRect();
+  const px = e.clientX - rect.left, py = e.clientY - rect.top;
+  meX = Math.max(15, Math.min(rect.width-15, px + dragOffX));
+  meY = Math.max(15, Math.min(rect.height-15, py + dragOffY));
+  orbMe.style.left = meX + 'px';
+  orbMe.style.top = meY + 'px';
+  const d = Math.hypot(meX - youX, meY - youY);
+  if(d < 46){
+    triggerMerge();
+  }
+}
+function onPointerUp(){ dragging = false; }
+orbMe.addEventListener('pointerdown', onPointerDown);
+orbMe.addEventListener('pointermove', onPointerMove);
+window.addEventListener('pointermove', (e) => { if(dragging) onPointerMove(e); });
+orbMe.addEventListener('pointerup', onPointerUp);
+orbMe.addEventListener('pointercancel', onPointerUp);
+window.addEventListener('pointerup', onPointerUp);
+
+let soulsDoneCallback = null;
+function triggerMerge(){
+  if(merged) return;
+  merged = true;
+  dragging = false;
+  orbYou.style.opacity = '0';
+  orbMe.style.opacity = '0';
+  document.getElementById('souls-instruction').style.opacity = '0';
+
+  const midX = (meX + youX) / 2;
+  const midY = (meY + youY) / 2;
+  startHeartCluster(midX, midY);
+
+  setTimeout(() => {
+    document.getElementById('drag-hint').classList.add('show');
+  }, 900);
+  setTimeout(() => {
+    if(soulsDoneCallback) soulsDoneCallback();
+  }, 3600);
+}
+
+/* ---------- Phase 2: falling hearts ---------- */
+function makeFallingHearts(container, count){
+  const glyphs = ['&#10084;','&#10083;'];
+  for(let i=0; i<count; i++){
+    const h = document.createElement('div');
+    h.className = 'fall-heart';
+    h.innerHTML = glyphs[Math.floor(Math.random()*glyphs.length)];
+    h.style.left = rand(2,96) + '%';
+    h.style.fontSize = rand(11,22) + 'px';
+    h.style.setProperty('--drift', rand(-50,50) + 'px');
+    h.style.animationDuration = rand(6,12) + 's';
+    h.style.animationDelay = rand(0,8) + 's';
+    container.appendChild(h);
+  }
+}
+makeFallingHearts(document.getElementById('quote-scene'), 18);
+
+/* ---------- Phase 3: floating hearts for envelope scene ---------- */
+function makeFloatingHearts(container, count){
+  const glyphs = ['&#10084;','&#10083;'];
+  for(let i=0; i<count; i++){
+    const h = document.createElement('div');
+    h.className = 'fall-heart';
+    h.innerHTML = glyphs[Math.floor(Math.random()*glyphs.length)];
+    h.style.left = rand(2,96) + '%';
+    h.style.fontSize = rand(11,22) + 'px';
+    h.style.setProperty('--drift', rand(-50,50) + 'px');
+    h.style.animationDuration = rand(7,13) + 's';
+    h.style.animationDelay = rand(0,10) + 's';
+    container.appendChild(h);
+  }
+}
+makeFloatingHearts(document.getElementById('envelope-scene'), 14);
+
+/* ---------- Sequence orchestration ---------- */
+const phases = ['intro-scene','souls-scene','quote-scene','envelope-scene'];
+let sequenceTimer = null;
+let skipped = false;
+
+function goToPhase(idx){
+  phases.forEach((id,i) => {
+    document.getElementById(id).classList.toggle('active', i === idx);
+  });
+  if(idx === 1){
+    placeInitialSouls();
+  }
+  if(idx === 2){
+    setTimeout(() => document.getElementById('quote-card').classList.add('show'), 200);
+  }
+  if(idx === 3){
+    document.getElementById('skip-btn').style.display = 'none';
+  }
+}
+
+function runSequence(){
+  goToPhase(0);
+  sequenceTimer = setTimeout(() => {
+    if(skipped) return;
+    goToPhase(1);
+    soulsDoneCallback = () => {
+      if(skipped) return;
+      goToPhase(2);
+      sequenceTimer = setTimeout(() => {
+        if(skipped) return;
+        goToPhase(3);
+      }, 3600);
+    };
+  }, 2600);
+}
+
+window.addEventListener('resize', () => { 
+  if(!merged) placeInitialSouls(); 
+  else sizeHeartCanvas(); 
+});
+
+// Skip Controller
+function skipIntro(){
+  if(skipped) return;
+  skipped = true;
+  clearTimeout(sequenceTimer);
+  
+  code1Active = false;
+  const c1Container = document.getElementById('code1-container');
+  c1Container.style.display = 'none';
+
+  goToPhase(3); 
+}
+
+/* ---------- Envelope open + letter typing ---------- */
+function spawnBurstHearts(container){
+  for(let i=0; i<10; i++){
+    const b = document.createElement('div');
+    b.className = 'burst-heart';
+    b.innerHTML = '&#10084;';
+    const angle = rand(0,360) * Math.PI/180;
+    const dist = rand(60,140);
+    b.style.setProperty('--bx', (Math.cos(angle)*dist) + 'px');
+    b.style.setProperty('--by', (-Math.abs(Math.sin(angle)*dist) - 20) + 'px');
+    b.style.animationDelay = (i*0.03) + 's';
+    container.appendChild(b);
+  }
+}
+
+let opened = false;
+function openEnvelope(){
+  if(opened) return;
+  opened = true;
+  const env = document.getElementById('envelope');
+  env.classList.add('open');
+  spawnBurstHearts(env);
+  setTimeout(showLetter, 950);
+}
+
+const letterText = "Dear Sara,\n\nI just wanted to write down a tiny piece of my heart to remind you of how unbelievably much you mean to me.\n\nIn a world where everything changes so fast, your smile is my favorite constant. You make the ordinary days feel magical, and the hard days so much lighter, just by being your wonderfully cute, sweet self. \n\nI am so incredibly lucky to have you in my universe. Thank you for the laughter, the endless warm hugs, and for being the most beautiful part of my life.\n\nPlease know that I will always be right there by your side—whether it brings you pure happiness and success, or carries you through a downfall. Whenever you miss me, or whenever you find yourself facing a problem, I promise I will be there for you.\n\nYou deserve all the love in the world, and I promise to keep showing up to celebrate you every single day.\n\nSending you the biggest hug ever!";
+
+function typeLetter(text, el, done){
+  let i = 0;
+  el.innerHTML = '';
+  const cursor = document.createElement('span');
+  cursor.className = 'cursor';
+  el.appendChild(cursor);
+  const speed = 14;
+  function step(){
+    if(i < text.length){
+      cursor.insertAdjacentText('beforebegin', text.charAt(i));
+      growScroll();
+      i++;
+      setTimeout(step, speed);
+    } else {
+      cursor.remove();
+      if(done) done();
+    }
+  }
+  step();
+}
+
+function growScroll(){
+  const overlay = document.getElementById('letter-overlay');
+  overlay.scrollTop = overlay.scrollHeight;
+}
+
+function showLetter(){
+  const overlay = document.getElementById('letter-overlay');
+  overlay.classList.add('show');
+  const body = document.getElementById('letter-body');
+  const signoff = document.getElementById('letter-signoff');
+  const closeBtn = document.getElementById('close-btn');
+  signoff.classList.remove('show');
+  closeBtn.classList.remove('show');
+  setTimeout(() => {
+    typeLetter(letterText, body, () => {
+      setTimeout(() => {
+        signoff.classList.add('show');
+        closeBtn.classList.add('show');
+        growScroll();
+      }, 300);
+    });
+  }, 500);
+}
+
+function closeLetter(){
+  const overlay = document.getElementById('letter-overlay');
+  overlay.classList.remove('show');
+  const env = document.getElementById('envelope');
+  env.classList.remove('open');
+  document.querySelectorAll('.burst-heart').forEach(b => b.remove());
+  opened = false;
+}
+
+/* ============================================================
+   START INITIALIZERS ON LOAD
+   ============================================================ */
+resizeAllCode1();
+requestAnimationFrame(loopCode1);
+</script>
+
+</body>
+</html>
